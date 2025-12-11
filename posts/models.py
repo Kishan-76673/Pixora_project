@@ -111,7 +111,8 @@ class Story(models.Model):
             from django.utils import timezone
             from datetime import timedelta
             # self.expires_at = timezone.now() + timedelta(hours=24)
-            self.expires_at = timezone.now() + timedelta(minutes=5) 
+            self.expires_at = timezone.now() + timedelta(minutes=2) 
+            print(f"Story will expire at: {self.expires_at}") 
         super().save(*args, **kwargs)
     
     def __str__(self):

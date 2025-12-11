@@ -4,9 +4,23 @@ export const postService = {
   // Get all posts (feed)
   getPosts: async () => {
     const response = await api.get('/posts/');
-    // Handle pagination
     if (response.data && response.data.results) {
-        return response.data.results; // Extract results array
+      return response.data.results;
+    }
+    return response.data;
+  },
+
+  // Get single post - ADD THIS METHOD
+  getPost: async (postId) => {
+    const response = await api.get(`/posts/${postId}/`);
+    return response.data;
+  },
+
+  // Get user posts
+  getUserPosts: async (username) => {
+    const response = await api.get(`/users/${username}/posts/`);
+    if (response.data && response.data.results) {
+      return response.data.results;
     }
     return response.data;
   },
@@ -45,10 +59,10 @@ export const postService = {
 
   // Add comment
   addComment: async (postId, text) => {
-    const response = await api.post(`/posts/${postId}/comments/`, { 
-  text,
-  post: postId 
-});
+    const response = await api.post(`/posts/${postId}/comments/`, {
+      text,
+      post: postId
+    });
     return response.data;
   },
 

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 
 from .models import Follow
 from .serializers import FollowSerializer
-from accounts.serializers import UserSerializer
+from accounts.serializers import UserSerializer, UserProfileSerializer
 
 User = get_user_model()
 
@@ -32,16 +32,24 @@ class FollowUserView(APIView):
             follower=request.user,
             following=user_to_follow
         )
-        
+
+        # Get updated counts
+        follower_count = Follow.objects.filter(following=user_to_follow).count()
+        following_count = Follow.objects.filter(follower=request.user).count()
+
         if created:
             return Response({
                 'message': f'You are now following {username}',
-                'following': True
+                'following': True,
+                'follower_count': follower_count,
+                'following_count': following_count
             }, status=status.HTTP_201_CREATED)
         else:
             return Response({
                 'message': f'You are already following {username}',
-                'following': True
+                'following': True,
+                'follower_count': follower_count,
+                'following_count': following_count
             }, status=status.HTTP_200_OK)
     
     def delete(self, request, username):
@@ -54,9 +62,15 @@ class FollowUserView(APIView):
             )
             follow.delete()
             
+            # Get updated counts
+            follower_count = Follow.objects.filter(following=user_to_unfollow).count()
+            following_count = Follow.objects.filter(follower=request.user).count()
+            
             return Response({
                 'message': f'You unfollowed {username}',
-                'following': False
+                'following': False,
+                'follower_count': follower_count,
+                'following_count': following_count
             }, status=status.HTTP_200_OK)
         except Follow.DoesNotExist:
             return Response({
@@ -107,3 +121,4 @@ class FollowingListView(generics.ListAPIView):
         # Get all users this user follows
         following_ids = Follow.objects.filter(follower=user).values_list('following', flat=True)
         return User.objects.filter(id__in=following_ids)
+        

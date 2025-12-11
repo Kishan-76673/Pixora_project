@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
 import { postService } from '../services/postService';
 import PostCard from '../components/posts/PostCard';

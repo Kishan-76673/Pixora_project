@@ -2,10 +2,19 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import User
-# from .models import Follow 
+from .models import EmailOTP
 from social.models import Follow
 import re
 User = get_user_model()
+
+class SendOTPSerializer(serializers.Serializer):
+    """Serializer for sending OTP"""
+    email = serializers.EmailField()
+
+class VerifyOTPSerializer(serializers.Serializer):
+    """Serializer for verifying OTP"""
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6)
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model"""

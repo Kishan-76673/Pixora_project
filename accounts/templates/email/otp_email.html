@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #6366f1;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 10px;
+        }
+        .otp-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">📸 PIXORA</div>
+            <p style="color: #6b7280; margin: 0;">Share Your Moments, Connect Your World</p>
+        </div>
+        
+        <h2 style="color: #1f2937;">Welcome to Pixora! 🎉</h2>
+        
+        <p>Thank you for joining our creative community! To complete your registration, please use the OTP code below:</p>
+        
+        <div class="otp-box">
+            <p style="margin: 0; font-size: 14px;">Your Verification Code</p>
+            <div class="otp-code">{{ otp_code }}</div>
+            <p style="margin: 0; font-size: 12px; opacity: 0.9;">Valid for 5 minutes</p>
+        </div>
+        
+        <p style="color: #6b7280;">
+            <strong>⚠️ Security Notice:</strong><br>
+            • Never share this code with anyone<br>
+            • Pixora staff will never ask for your OTP<br>
+            • This code expires in 5 minutes
+        </p>
+        
+        <div class="footer">
+            <p>© {{ current_year }} Pixora. All rights reserved.</p>
+            <p>This is an automated message, please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>

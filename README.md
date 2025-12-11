@@ -64,8 +64,6 @@ Username: Robin
 Password: Robin@76673
 python manage.py changepassword Robin
 
-
-
 ########################################################################################################################################################
 
 # Pixora - Frontend Setup Guide
