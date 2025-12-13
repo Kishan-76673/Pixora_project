@@ -117,8 +117,6 @@ body.bg-dark {
   transform: scale(1.25);
 }
 
-
-
 .navbar-toggler i {
   color: var(--text-color);
 }

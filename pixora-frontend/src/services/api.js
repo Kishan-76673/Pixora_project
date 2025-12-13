@@ -22,35 +22,6 @@ api.interceptors.request.use(
   }
 );
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   async (error) => {
-//     const originalRequest = error.config;
-
-//     if (error.response?.status === 401 && !originalRequest._retry) {
-//       originalRequest._retry = true;
-
-//       try {
-//         const refreshToken = localStorage.getItem('refreshToken');
-//         const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
-//           refresh: refreshToken,
-//         });
-
-//         const { access } = response.data;
-//         localStorage.setItem('accessToken', access);
-//         originalRequest.headers.Authorization = `Bearer ${access}`;
-//         return api(originalRequest);
-//       } catch (refreshError) {
-//         localStorage.removeItem('accessToken');
-//         localStorage.removeItem('refreshToken');
-//         window.location.href = '/login';
-//         return Promise.reject(refreshError);
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-
 // Response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,

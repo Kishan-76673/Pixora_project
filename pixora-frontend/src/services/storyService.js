@@ -1,12 +1,6 @@
 import api from './api';
 
 export const storyService = {
-  // Get all stories from followed users
-  // getStories: async () => {
-  //   const response = await api.get('/stories/');
-  //   return response.data;
-  // },
-
   getStories: async () => {
     try {
       const response = await api.get('/stories/');

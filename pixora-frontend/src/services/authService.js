@@ -22,7 +22,6 @@ refreshToken: async () => {
 
   register: async (userData) => {
     try {
-      // Send BOTH password and confirmPassword (same value)
       const dataToSend = {
         email: userData.email,
         username: userData.username,

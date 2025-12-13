@@ -149,7 +149,6 @@ def send_otp_email_background(email, otp_code):
             subject=subject,
             message=plain_message,
             from_email=settings.EMAIL_HOST_USER,
-            # from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
             html_message=html_message,
             fail_silently=False,
@@ -215,7 +214,6 @@ class SendOTPView(APIView):
         
        # Send email with OTP in background thread
         try:
-            # For development, show OTP in console
             if settings.DEBUG:
                 print(f"\n{'='*50}")
                 print(f"OTP for {email}: {otp_code}")
@@ -461,9 +459,6 @@ class CurrentUserView(APIView):
     
     def get_object(self):
         return self.request.user
-    # def get(self, request):
-    #     serializer = UserProfileSerializer(request.user, context={'request': request})
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserProfileView(generics.RetrieveAPIView):
     """

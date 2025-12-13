@@ -114,29 +114,8 @@ class RegisterSerializer(serializers.ModelSerializer):
             'email': {'required': True},
             'username': {'required': True},
             'full_name': {'required': False},
-            # 'password': {'write_only': True},
         }
-    # def validate(self, data):
-    #     email = data.get('email')
-    #     username = data.get('username')
-    #     password = data.get('password')
 
-    #     # Check if passwords match
-    #     if data.get('password') != data.get('confirmPassword'):
-    #         raise serializers.ValidationError({
-    #             "confirmPassword": "Passwords do not match."
-    #         })
-        
-    #     # Remove confirmPassword from validated data before saving
-    #     data.pop('confirmPassword', None)
-
-
-    #     # Strong Rules
-    #     validate_email_rules(email)
-    #     validate_username_rules(username)
-    #     validate_password_strength(password)
-
-        # return data
     
     def validate_email(self, value):
         value = value.lower()
@@ -166,12 +145,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Username already taken")
         
         return value
-        # if User.objects.filter(username=value).exists():
-        #     raise serializers.ValidationError("Username already taken")
-        # if not value.replace('_', '').isalnum():
-        #     raise serializers.ValidationError("Username can only contain letters, numbers, and underscores")
-        
-        # return value.lower()
 
     def create(self, validated_data):
         # Create user with validated data
@@ -206,36 +179,3 @@ class LoginSerializer(serializers.Serializer):
             return data
         else:
             raise serializers.ValidationError("Must include email and password")
-
-# def validate_password_strength(password):
-#     if len(password) < 8:
-#         raise serializers.ValidationError("Password must be at least 8 characters long.")
-#     if not re.search(r"[A-Z]", password):
-#         raise serializers.ValidationError("Password must contain at least one uppercase letter.")
-#     if not re.search(r"[a-z]", password):
-#         raise serializers.ValidationError("Password must contain at least one lowercase letter.")
-#     if not re.search(r"\d", password):
-#         raise serializers.ValidationError("Password must contain at least one number.")
-#     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
-#         raise serializers.ValidationError("Password must contain at least one special character.")
-
-# def validate_username_rules(username):
-#     if len(username) < 8:
-#         raise serializers.ValidationError("Username must be at least 8 characters long.")
-#     if not re.search(r"[A-Z]", username):
-#         raise serializers.ValidationError("Username must contain at least one uppercase letter.")
-#     if not re.search(r"[a-z]", username):
-#         raise serializers.ValidationError("Username must contain at least one lowercase letter.")
-#     if not re.search(r"\d", username):
-#         raise serializers.ValidationError("Username must contain at least one number.")
-#     if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", username):
-#         raise serializers.ValidationError("Username must contain at least one special character.")
-
-# def validate_email_rules(email):
-#     if not re.match(r"^[\w\.-]+@[\w\.-]+\.(com|in)$", email):
-#         raise serializers.ValidationError("Email must contain @ and end with .com or .in")
-
-
-
-
-

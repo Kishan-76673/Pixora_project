@@ -7,17 +7,6 @@ export const userService = {
     return response.data;
   },
 
-  // Get current user profile
-  // getCurrentProfile: async () => {
-  //   try {
-  //     const response = await api.get('/auth/me/');
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error('Get profile error:', error);
-  //     throw error;
-  //   }
-  // },
-
   // UserService.js - Update getCurrentProfile function
 getCurrentProfile: async () => {
   try {

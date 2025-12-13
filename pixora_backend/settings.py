@@ -181,10 +181,9 @@ SIMPLE_JWT = {
 
 # CORS Configuration (for frontend)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React default port
-    # "http://localhost:5173",  # Vite default port
+    "http://localhost:3000", 
     "http://127.0.0.1:3000",  
-    "http://localhost:8080",  # Vue default port
+    "http://localhost:8080",  
 ]
 
 # Media Files Configuration (Local Storage for now)

@@ -1,3 +1,18 @@
+# Project Setup
+
+1. Clone the repository
+2. Copy `.env.example` to `.env`
+3. Fill in your credentials in `.env`
+4. Install dependencies:
+   - Backend: `pip install -r requirements.txt`
+   - Frontend: `npm install`
+5. Run migrations: `python manage.py migrate`
+6. Start servers:
+   - Backend: `python manage.py runserver`
+   - Frontend: `npm run dev`
+
+
+
 # pixora
 for learning only
 

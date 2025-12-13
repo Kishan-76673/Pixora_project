@@ -13,7 +13,6 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
-  // const { register, loading, error } = useAuthStore();
   const { register } = useAuthStore();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
@@ -127,62 +126,6 @@ const Register = () => {
       return;
     }
 
-    // setLoading(true);
-    // try {
-    //   // Check username availability by trying to register first
-    //   const checkData = {
-    //     email: formData.email,
-    //     username: formData.username,
-    //     full_name: formData.full_name || '',
-    //     password: formData.password,
-    //     confirmPassword: formData.password
-    //   };
-
-    //   console.log('Checking username availability...');
-
-    //   // Check if email is available
-    //   // await authService.checkEmailAvailability(formData.email);
-
-    //   // Check if username is available
-    //   // await authService.checkUsernameAvailability(formData.username);
-
-    //   await authService.sendOTP(formData.email);
-    //   setSuccess('Verification code sent to your email!');
-    //   setStep(2);
-    //   setTimer(300);
-    //   setCanResend(false);
-    //   setIsOtpExpired(false); 
-
-    // } catch (err) {
-    //   console.error('Send OTP error:', err.response?.data);
-    //   const errorData = err.response?.data;
-
-    //   // Handle different error cases
-    //   if (errorData?.email) {
-    //     const emailError = Array.isArray(errorData.email) ? errorData.email[0] : errorData.email;
-    //     if (emailError.includes('already exists') || emailError.includes('taken')) {
-    //       setError('Email already registered. Please use a different email or login.');
-    //     } else {
-    //       setError(`Email: ${emailError}`);
-    //     }
-    //   }
-    //   else if (errorData?.username) {
-    //     const usernameError = Array.isArray(errorData.username) ? errorData.username[0] : errorData.username;
-    //     if (usernameError.includes('already exists') || usernameError.includes('taken')) {
-    //       setError('Username already taken. Please choose a different username.');
-    //     } else {
-    //       setError(`Username: ${usernameError}`);
-    //     }
-    //   }
-    //   else if (errorData?.error) {
-    //     setError(errorData.error);
-    //   }
-    //   else {
-    //     setError('Failed to send verification code.');
-    //   }
-    // } finally {
-    //   setLoading(false);
-    // }
     setLoading(true);
     try {
       await authService.sendOTP(formData.email);
@@ -247,18 +190,9 @@ const Register = () => {
     setError('');
 
     try {
-      // console.log('Verifying OTP for:', formData.email);
 
       // 1. Verify OTP first
       const verifyResponse = await authService.verifyOTP(formData.email, otpCode);
-      // console.log('OTP verified:', verifyResponse);
-
-      // 2. Register user
-      // const { confirmPassword, ...userData } = formData;
-      // console.log('Registering user:', userData);
-
-      // const registerResponse = await authService.register(registrationData);
-      // console.log('Registration successful:', registerResponse);
 
       const { confirmPassword, ...userData } = formData;
       // Add confirmPassword back for the registration
@@ -266,11 +200,8 @@ const Register = () => {
         ...userData,
         confirmPassword: formData.password
       };
-      // console.log('Registering user:', registrationData);
 
       const registerResponse = await authService.register(registrationData);
-      // console.log('Registration successful:', registerResponse);
-
 
       // 3. Auto-login after registration
       const { access, refresh, user } = registerResponse;
@@ -379,26 +310,6 @@ const Register = () => {
       setLoading(false);
     }
   };
-
-  // Resend OTP
-  // const handleResendOTP = async () => {
-  //   setError('');
-  //   setSuccess('');
-  //   setLoading(true);
-
-  //   try {
-  //     await authService.sendOTP(formData.email);
-  //     setSuccess('New verification code sent!');
-  //     setOtp(['', '', '', '', '', '']);
-  //     setTimer(300);
-  //     setCanResend(false);
-  //     setIsOtpExpired(false);
-  //   } catch (error) {
-  //     setError(error.response?.data?.error || 'Failed to resend OTP');
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleResendOTP = async () => {
     setError('');
