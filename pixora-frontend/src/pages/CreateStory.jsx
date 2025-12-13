@@ -37,7 +37,6 @@ const CreateStory = () => {
       formData.append('media_type', mediaType);
 
       await storyService.createStory(formData);
-      alert('Story uploaded!');
       navigate('/');
     } catch (error) {
       console.error('Upload error:', error);

@@ -16,4 +16,13 @@ export default defineConfig({
       },
     },
   },
+ // Add this to serve static files from public folder
+  publicDir: 'public',
+  build: {
+    outDir: 'dist',
+    // Ensure favicon is included in build
+    assetsInclude: ['**/*.ico']
+  }
+
+
 })

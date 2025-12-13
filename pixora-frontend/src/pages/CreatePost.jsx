@@ -56,7 +56,7 @@ const CreatePost = () => {
       console.log('Uploading...', mediaType);
       await postService.createPost(formData);
 
-      alert('Post created successfully!');
+      // alert('Post created successfully!');
       navigate('/');
     } catch (error) {
       console.error('Upload error:', error);

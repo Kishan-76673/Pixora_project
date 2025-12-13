@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import CreateStory from './pages/CreateStory';
 import PostDetail from './pages/PostDetail';
+
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
   return isAuthenticated ? children : <Navigate to="/login" />;
@@ -27,7 +28,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
@@ -37,7 +38,6 @@ function App() {
           <Route path="profile/:username" element={<Profile />} />
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="stories/create" element={<CreateStory />} />
-
           <Route path="posts/:postId" element={<PostDetail />} />
         </Route>
       </Routes>

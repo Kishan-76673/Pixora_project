@@ -73,14 +73,12 @@ const PostCard = ({ post, onDelete }) => {
     };
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this post?')) {
             try {
                 await postService.deletePost(post.id);
                 onDelete && onDelete(post.id);
             } catch (error) {
                 console.error('Delete error:', error);
                 alert('Failed to delete post');
-            }
         }
     };
 

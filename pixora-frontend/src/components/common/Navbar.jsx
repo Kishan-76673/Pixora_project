@@ -9,10 +9,10 @@ const Navbar = () => {
   const location = useLocation();
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
+    // if (window.confirm("Are you sure you want to logout?")) {
       logout();
       navigate("/login");
-    }
+    // }
   };
 
   return (

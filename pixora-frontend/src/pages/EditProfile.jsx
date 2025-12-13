@@ -22,6 +22,7 @@ const EditProfile = () => {
 
   const loadProfile = async () => {
     try {
+      setLoading(true);
       const profile = await userService.getCurrentProfile();
       setFormData({
         full_name: profile.full_name || '',
@@ -30,8 +31,18 @@ const EditProfile = () => {
       setAvatarPreview(profile.avatar_url);
     } catch (error) {
       console.error('Load profile error:', error);
+    // Fallback to current user data from localStorage
+    if (currentUser) {
+      setFormData({
+        full_name: currentUser.full_name || '',
+        bio: currentUser.bio || '',
+      });
+      setAvatarPreview(currentUser.avatar_url);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -209,7 +220,7 @@ const EditProfile = () => {
         </div>
       </div>
     </div>
-  );
+  ); 
 };
 
 export default EditProfile;

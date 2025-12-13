@@ -50,31 +50,38 @@ const Home = () => {
     <div className="row justify-content-center">
       <div className="col-lg-6 col-md-8">
         <StoriesCarousel onStoryClick={handleStoryClick} />
-        {/* <h2 className="mb-4">Welcome, {user?.username}!</h2> */}
-       {posts.length === 0 ? (  
-        <div className="card border-0 shadow-sm">
-          <div className="card-body text-center py-5">
-            <i className="bi bi-images display-1 text-muted mb-3"></i>
-            <h5 className="card-title">No posts yet</h5>
-            <p className="card-text text-muted">
-              Start following users or create your first post!
-            </p>
-          </div>
-        </div>) : (
+        {posts.length === 0 ? (
+          <div className="card border-0 shadow-sm">
+            <div className="card-body text-center py-5">
+              <i className="bi bi-images display-1 text-muted mb-3"></i>
+              <h5 className="card-title">No posts yet</h5>
+              <p className="card-text text-muted">
+                Start following users or create your first post!
+              </p>
+            </div>
+          </div>) : (
           posts.map((post) => (
             <PostCard key={post.id} post={post} onDelete={handleDelete} />
           ))
         )}
       </div>
 
-      {/* Story Viewer Modal */}
       {viewingStory && (
         <StoryViewer
           storyId={viewingStory}
-          stories={allStories}
-          onClose={() => setViewingStory(null)}
-          onNext={() => setViewingStory(null)}
-          onPrevious={() => {}}
+          stories={allStories} 
+          onClose={() => {
+            setViewingStory(null);
+            setAllStories([]);
+          }}
+          onNext={() => {
+            // Handle next user's stories
+            console.log('Next story group');
+          }}
+          onPrevious={() => {
+            // Handle previous user's stories
+            console.log('Previous story group');
+          }}
         />
       )}
     </div>

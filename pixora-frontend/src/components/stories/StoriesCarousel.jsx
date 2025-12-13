@@ -14,34 +14,55 @@ const StoriesCarousel = ({ onStoryClick }) => {
   }, []);
 
   const loadStories = async () => {
-    try {
-      const data = await storyService.getStories();
-      setStories(data);
-      
-      // Group stories by user
-      const grouped = data.reduce((acc, story) => {
-        const username = story.user.username;
-        if (!acc[username]) {
-          acc[username] = {
-            user: story.user,
-            stories: [],
-            hasUnviewed: false
-          };
-        }
-        acc[username].stories.push(story);
-        if (!story.is_viewed) {
-          acc[username].hasUnviewed = true;
+  try {
+    setLoading(true);
+    const data = await storyService.getStories();
+    
+    // Check if data is valid before processing
+    if (!data) {
+      console.warn('No stories data received');
+      setStories([]);
+      setGroupedStories({});
+      return;
+    }
+    
+    // Ensure data is an array
+    const storiesArray = Array.isArray(data) ? data : (data?.results || data?.data || []);
+    
+    setStories(storiesArray);
+    
+    // Only use reduce if storiesArray is an array and has items
+    if (Array.isArray(storiesArray) && storiesArray.length > 0) {
+      const grouped = storiesArray.reduce((acc, story) => {
+        if (story && story.user && story.user.username) {
+          const username = story.user.username;
+          if (!acc[username]) {
+            acc[username] = {
+              user: story.user,
+              stories: [],
+              hasUnviewed: false
+            };
+          }
+          acc[username].stories.push(story);
+          if (!story.is_viewed) {
+            acc[username].hasUnviewed = true;
+          }
         }
         return acc;
       }, {});
       
       setGroupedStories(grouped);
-    } catch (error) {
-      console.error('Load stories error:', error);
-    } finally {
-      setLoading(false);
+    } else {
+      setGroupedStories({});
     }
-  };
+  } catch (error) {
+    console.error('Load stories error:', error);
+    setStories([]);
+    setGroupedStories({});
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (loading) {
     return <div className="text-center py-3">Loading stories...</div>;
