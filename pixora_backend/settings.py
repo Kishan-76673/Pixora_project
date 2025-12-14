@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import load_dotenv 
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'channels',   
 
     # Your apps
     'accounts',
@@ -51,6 +53,7 @@ INSTALLED_APPS = [
     'social',
     'notifications',
     'analytics',
+    'chat',
     # for OTP
     'django_otp',
     'django_otp.plugins.otp_totp',
@@ -99,8 +102,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "pixora_backend.wsgi.application"
+# WSGI_APPLICATION = "pixora_backend.wsgi.application"
+ASGI_APPLICATION = "pixora_backend.asgi.application"
 
+# Add Channels Layer Configuration (using in-memory for development)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -184,7 +194,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
     "http://127.0.0.1:3000",  
     "http://localhost:8080",  
+    "ws://localhost:8000",   
+    "ws://127.0.0.1:8000",   
 ]
+
+CORS_ALLOW_CREDENTIALS = True 
 
 # Media Files Configuration (Local Storage for now)
 MEDIA_URL = '/media/'

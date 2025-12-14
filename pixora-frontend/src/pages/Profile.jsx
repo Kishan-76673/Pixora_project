@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { userService } from '../services/UserService';
-import { postService } from '../services/postService';
+// import { postService } from '../services/postService';
 import { useAuthStore } from '../store/authStore';
 import { followService } from '../services/followService';
+import { useNavigate } from 'react-router-dom';
+import { useChat } from '../context/ChatContext';
 
 const Profile = () => {
     const { username } = useParams();
@@ -16,7 +18,13 @@ const Profile = () => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [followLoading, setFollowLoading] = useState(false);
 
-    const isOwnProfile = currentUser?.username === username;
+    // const isOwnProfile = currentUser?.username === username;
+
+    const navigate = useNavigate();
+    const { createOrGetConversation } = useChat();
+    // const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+    // const isOwnProfile = currentUser.id === profileUser?.id;
+    const isOwnProfile = currentUser?.username === profile?.username;
 
     useEffect(() => {
         setProfile(null);
@@ -42,6 +50,18 @@ const Profile = () => {
             setError('User not found');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleMessageClick = async () => {
+        if (!profile?.id) return;
+        try {
+            const conversation = await createOrGetConversation(profile.id);
+            navigate('/messages', {
+                state: { conversationId: conversation.id }
+            });
+        } catch (error) {
+            console.error('Error creating conversation:', error);
         }
     };
 
@@ -209,18 +229,28 @@ const Profile = () => {
                                         Edit Profile
                                     </Link>
                                 ) : (
-                                    <button
-                                        className={`btn ${isFollowing ? 'btn-outline-secondary' : 'btn-primary'}`}
-                                        onClick={handleFollowToggle}
-                                        disabled={followLoading}
-                                    >
-                                        {followLoading ? (
-                                            <span className="spinner-border spinner-border-sm me-2"></span>
-                                        ) : (
-                                            <i className={`bi bi-person-${isFollowing ? 'dash' : 'plus'} me-2`}></i>
-                                        )}
-                                        {isFollowing ? 'Unfollow' : 'Follow'}
-                                    </button>
+                                    <>
+                                        <button
+                                            className={`btn ${isFollowing ? 'btn-outline-secondary' : 'btn-primary'}`}
+                                            onClick={handleFollowToggle}
+                                            disabled={followLoading}
+                                        >
+                                            {followLoading ? (
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                            ) : (
+                                                <i className={`bi bi-person-${isFollowing ? 'dash' : 'plus'} me-2`}></i>
+                                            )}
+                                            {isFollowing ? 'Unfollow' : 'Follow'}
+                                        </button>
+
+                                        <button
+                                            onClick={handleMessageClick}
+                                            className="btn btn-outline-primary"
+                                        >
+                                            <i className="bi bi-chat-dots me-2"></i>
+                                            Message
+                                        </button>
+                                    </>
                                 )}
                             </div>
 
@@ -251,7 +281,6 @@ const Profile = () => {
                 </div>
             </div>
 
-            {/* Tabs - FIXED: Removed duplicate follow button */}
             <div className="border-top">
                 <ul className="nav nav-tabs justify-content-center border-0">
                     <li className="nav-item">

@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import CreateStory from './pages/CreateStory';
 import PostDetail from './pages/PostDetail';
+import Messages from './pages/Messages';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -39,6 +40,7 @@ function App() {
           <Route path="profile/edit" element={<EditProfile />} />
           <Route path="stories/create" element={<CreateStory />} />
           <Route path="posts/:postId" element={<PostDetail />} />
+          <Route path="/messages" element={<Messages />} />
         </Route>
       </Routes>
     </BrowserRouter>
