@@ -43,8 +43,10 @@ const PostCard = ({ post, onDelete }) => {
 
         setLoadingComments(true);
         try {
+            // const data = await postService.getComments(post.id);
+            // setComments(data);
             const data = await postService.getComments(post.id);
-            setComments(data);
+            setComments(data.results || data.comments || []);
             setShowComments(true);
         } catch (error) {
             console.error('Load comments error:', error);
@@ -62,7 +64,7 @@ const PostCard = ({ post, onDelete }) => {
             await postService.addComment(post.id, commentText);
             setCommentText('');
             const updatedComments = await postService.getComments(post.id);
-            setComments(updatedComments);
+            setComments(updatedComments.results || updatedComments.comments || []);
             setShowComments(true);
         } catch (error) {
             console.error('Comment error:', error);
@@ -73,12 +75,12 @@ const PostCard = ({ post, onDelete }) => {
     };
 
     const handleDelete = async () => {
-            try {
-                await postService.deletePost(post.id);
-                onDelete && onDelete(post.id);
-            } catch (error) {
-                console.error('Delete error:', error);
-                alert('Failed to delete post');
+        try {
+            await postService.deletePost(post.id);
+            onDelete && onDelete(post.id);
+        } catch (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete post');
         }
     };
 
@@ -269,7 +271,7 @@ const PostCard = ({ post, onDelete }) => {
                         ) : (
                             <>
                                 <div className="mb-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                    {comments.length === 0 ? (
+                                    {Array.isArray(comments) && comments.length === 0 ?(
                                         <p className="text-muted text-center small">No comments yet</p>
                                     ) : (
                                         comments.map(comment => (
