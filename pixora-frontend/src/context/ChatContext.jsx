@@ -45,8 +45,28 @@ export const ChatProvider = ({ children }) => {
 
       if (message.conversation === activeConversation) {
         setCurrentMessages(prev => {
+          // Check if this is replacing an optimistic message
+          const optimisticIndex = prev.findIndex(
+            m => m.optimistic && 
+            m.sender.id === message.sender.id && 
+            m.content === message.content
+          );
+
+          if (optimisticIndex !== -1) {
+            // Replace optimistic message with real one
+            const updated = [...prev];
+            updated[optimisticIndex] = message;
+            return updated;
+          }
+
+          // Check if message already exists (by real ID)
           const exists = prev.some(m => m.id === message.id);
-          return exists ? prev : [...prev, message];
+          if (exists) {
+            return prev;
+          }
+
+          // Add new message
+          return [...prev, message];
         });
 
         if (message.sender.id !== getCurrentUserId()) {
@@ -129,17 +149,17 @@ export const ChatProvider = ({ children }) => {
   const sendMessage = (content, replyTo = null) => {
     if (!activeConversation || !content.trim()) return;
 
-    setCurrentMessages(prev => [
-      ...prev,
-      {
-        id: `temp-${Date.now()}`,
-        content,
-        conversation: activeConversation,
-        sender: { id: getCurrentUserId(), username: 'You' },
-        optimistic: true,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    // Create optimistic message with temporary ID
+    const optimisticMessage = {
+      id: `temp-${Date.now()}`,
+      content: content.trim(),
+      conversation: activeConversation,
+      sender: { id: getCurrentUserId(), username: 'You' },
+      optimistic: true,
+      created_at: new Date().toISOString(),
+    };
+
+    setCurrentMessages(prev => [...prev, optimisticMessage]);
 
     wsSendMessage(activeConversation, content.trim(), replyTo);
   };
@@ -152,7 +172,6 @@ export const ChatProvider = ({ children }) => {
 
   const updateConversationWithMessage = (message) => {
     setConversations(prev => {
-      // ✅ Ensure prev is always an array
       if (!Array.isArray(prev)) {
         console.warn('Conversations is not an array, initializing as empty array');
         return [];
