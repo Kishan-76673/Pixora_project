@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { userService } from '../services/UserService';
-// import { postService } from '../services/postService';
 import { useAuthStore } from '../store/authStore';
 import { followService } from '../services/followService';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +21,6 @@ const Profile = () => {
 
     const navigate = useNavigate();
     const { createOrGetConversation } = useChat();
-    // const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-    // const isOwnProfile = currentUser.id === profileUser?.id;
     const isOwnProfile = currentUser?.username === profile?.username;
 
     useEffect(() => {
@@ -82,70 +79,6 @@ const Profile = () => {
             console.error('Check follow status error:', error);
         }
     };
-
-    // const handleFollowToggle = async () => {
-    //     setFollowLoading(true);
-    //     try {
-    //         if (isFollowing) {
-    //             await followService.unfollowUser(username);
-    //             setIsFollowing(false);
-
-    //             // instantly update follower count
-    //             setProfile(prev => ({
-    //                 ...prev,
-    //                 follower_count: Math.max(0, prev.follower_count - 1)
-    //             }));
-    //             // Update *your* following count safely (Zustand store)
-    //             useAuthStore.setState(state => ({
-    //                 user: {
-    //                     ...state.user,
-    //                     following_count: Math.max(0, state.user.following_count - 1)
-    //                 }
-    //             }));
-
-
-
-    //             // If viewing your own profile, update it also
-    //         if (isOwnProfile) {
-    //             setProfile(prev => ({
-    //                 ...prev,
-    //                 following_count: Math.max(0, prev.following_count - 1)
-    //             }));
-    //         }
-    //         } else {
-    //             await followService.followUser(username);
-    //             setIsFollowing(true);
-
-    //             // instantly update follower count
-    //             setProfile(prev => ({
-    //                 ...prev,
-    //                 follower_count: prev.follower_count + 1
-    //             }));
-    //             // Update your following count safely
-    //             useAuthStore.setState(state => ({
-    //                 user: {
-    //                     ...state.user,
-    //                     following_count: state.user.following_count + 1
-    //                 }
-    //             }));
-
-    //           if (isOwnProfile) {
-    //             setProfile(prev => ({
-    //                 ...prev,
-    //                 following_count: prev.following_count + 1
-    //             }));
-    //         }
-
-    //         }
-    //         // loadProfile();
-    //     } catch (error) {
-    //         console.error('Follow toggle error:', error);
-    //         alert('Failed to update follow status');
-    //     } finally {
-    //         setFollowLoading(false);
-    //     }
-    // };
-
 
     const handleFollowToggle = async () => {
         setFollowLoading(true);

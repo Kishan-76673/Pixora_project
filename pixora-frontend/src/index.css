@@ -36,7 +36,6 @@ body.bg-dark {
   color: #f5f5f5;
 }
 
-
 /* Dark mode card styles */
 [data-bs-theme="dark"] .card {
   background-color: #1e1e1e;
@@ -44,11 +43,6 @@ body.bg-dark {
 }
 
 [data-bs-theme="dark"] .card-header {
-  background-color: #1e1e1e !important;
-  border-color: #3a3a3a;
-}
-
-[data-bs-theme="dark"] .navbar {
   background-color: #1e1e1e !important;
   border-color: #3a3a3a;
 }
@@ -84,10 +78,6 @@ body.bg-dark {
   border-color: #0081d8;
 }
 
-.modern-navbar {
-  background-color: #0d6efd !important; /* Bootstrap primary blue */
-}
-
 .pixora-logo {
   font-family: 'Dancing Script', cursive;
   font-size: 1.8rem;
@@ -98,23 +88,9 @@ body.bg-dark {
   text-shadow: 0 0 5px rgba(255,255,255,0.3);
 }
 
-.active-icon i {
-  background: rgba(255,255,255,0.3);
-  color: white;
-  transform: scale(1.15);
-}
 
-.nav-icon {
-  color: #e7efff;
-  transition: 0.22s ease-in-out;
-  padding: 6px 9px;
-  border-radius: 8px;
-}
-
-.nav-icon:hover {
-  background: rgba(255,255,255,0.2);
-  color: #fff;
-  transform: scale(1.25);
+.navbar-nav {
+  align-items: center;
 }
 
 .navbar-toggler i {
@@ -154,4 +130,83 @@ body.bg-dark {
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
+}
+
+/* Brand */
+.pixora-navbar .navbar-brand {
+  color: #ffffff !important;
+}
+
+/* Nav links & icons */
+.pixora-navbar .nav-link,
+.pixora-navbar i {
+  color: #ffffff !important;
+}
+
+/* Hover effect */
+.pixora-navbar .nav-link:hover {
+  opacity: 0.85;
+}
+
+/* Ignore theme mode completely */
+body .pixora-navbar,
+body.dark .pixora-navbar,
+body.light .pixora-navbar,
+[data-theme="dark"] .pixora-navbar,
+[data-theme="light"] .pixora-navbar {
+  background-color: hsl(226, 94%, 46%) !important;
+  color: #ffffff !important;
+}
+
+.pixora-navbar .navbar-brand,
+.pixora-navbar .nav-link,
+.pixora-navbar i {
+  color: #ffffff !important;
+}
+
+.navbar-icon-btn {
+  will-change: transform;
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  color: #ffffff;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* Icon size */
+.navbar-icon-btn i {
+  font-size: 1.35rem;
+}
+
+/* Hover zoom + glow */
+.navbar-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(1.2);
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.35);
+}
+
+/* Active (clicked) */
+.navbar-icon-btn:active {
+  transform: scale(0.95);
+}
+
+/* Remove default focus outline */
+.navbar-icon-btn:focus,
+.navbar-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Active page highlight */
+.navbar-icon-btn.active-nav {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.25);
 }

@@ -9,15 +9,16 @@ const Navbar = () => {
   const location = useLocation();
 
   const handleLogout = () => {
-      logout();
-      navigate("/login");
+    logout();
+    navigate("/login");
   };
 
   return (
-    <nav className="navbar navbar-expand-lg modern-navbar shadow-sm sticky-top">
+    <nav
+      className="navbar navbar-expand-lg shadow-sm sticky-top pixora-navbar"
+    >
       <div className="container">
-
-        <Link to="/" className="navbar-brand pixora-logo text-white fw-bold fs-3">
+        <Link to="/" className="navbar-brand pixora-logo fw-bold fs-3">
           Pixora
         </Link>
 
@@ -36,7 +37,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 <li className="nav-item mx-2">
-                  <span className="nav-link text-white fw-semibold">
+                  <span className="nav-link fw-semibold">
                     Hi, {user?.username}
                   </span>
                 </li>
@@ -44,53 +45,63 @@ const Navbar = () => {
                 <li className="nav-item mx-2">
                   <Link
                     to="/"
-                    className={`nav-link nav-icon ${location.pathname === "/" ? "active-icon" : ""}`}
+                    className={`navbar-icon-btn ${location.pathname === "/" ? "active-nav" : ""}`}
                     title="Home"
                   >
-                    <i className="bi bi-house-door fs-4"></i>
+                    <i className="bi bi-house-door"></i>
                   </Link>
                 </li>
 
                 <li className="nav-item mx-2">
                   <Link
                     to="/create"
-                    className={`nav-link nav-icon ${location.pathname === "/create" ? "active-icon" : ""}`}
+                    className={`navbar-icon-btn ${location.pathname === "/create" ? "active-nav" : ""}`}
                     title="Create Post"
                   >
-                    <i className="bi bi-plus-square fs-4"></i>
+                    <i className="bi bi-plus-square"></i>
                   </Link>
                 </li>
 
                 <li className="nav-item mx-2">
-                  <Link to={`/profile/${user?.username}`} className="nav-link" title="Profile">
+                  <Link
+                    to={`/profile/${user?.username}`}
+                    className="navbar-icon-btn"
+                    title="Profile"
+                  >
                     {user?.avatar_url ? (
                       <img
                         src={user.avatar_url}
                         alt={user.username}
-                        className="rounded-circle"
-                        style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                        style={{
+                          width: "28px",
+                          height: "28px",
+                          borderRadius: "50%",
+                          objectFit: "cover"
+                        }}
                       />
                     ) : (
-                      <i className="bi bi-person-circle fs-4"></i>
+                      <i className="bi bi-person-circle"></i>
                     )}
                   </Link>
                 </li>
 
-                {/* Dark Mode Toggle */}
                 <li className="nav-item mx-2">
                   <button
                     onClick={toggleTheme}
-                    className="btn btn-link nav-link p-0"
+                    className="navbar-icon-btn"
                     title={isDark ? "Light Mode" : "Dark Mode"}
                   >
-                    <i className={`bi bi-${isDark ? 'sun' : 'moon'}-fill fs-4`}></i>
+                    <i className={`bi bi-${isDark ? 'sun' : 'moon'}-fill`}></i>
                   </button>
                 </li>
 
                 <li className="nav-item mx-2">
-                  <button className="btn btn-light px-3 rounded" onClick={handleLogout} title="Logout">
-                    {/* Logout */}
-                    <i className="bi bi-box-arrow-right fs-4"></i>
+                  <button
+                    className="navbar-icon-btn"
+                    onClick={handleLogout}
+                    title="Logout"
+                  >
+                    <i className="bi bi-box-arrow-right"></i>
                   </button>
                 </li>
               </>

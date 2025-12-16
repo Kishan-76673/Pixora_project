@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import useWebSocket from '../hooks/useWebSocket';
 import chatService from '../services/chatService';
-
 const ChatContext = createContext();
 
 export const useChat = () => {
@@ -20,6 +19,7 @@ export const ChatProvider = ({ children }) => {
   const [typingUsers, setTypingUsers] = useState(new Map());
 
   const token = localStorage.getItem('accessToken');
+
   const {
     isConnected,
     messages: wsMessages,
@@ -31,67 +31,45 @@ export const ChatProvider = ({ children }) => {
     setMessages: setWsMessages
   } = useWebSocket(token);
 
-  // Load conversations on mount
+  // Load conversations
   useEffect(() => {
     if (token) {
       loadConversations();
     }
   }, [token]);
 
-  // Handle new WebSocket messages
+  // Handle incoming WS messages
   useEffect(() => {
-    if (wsMessages.length > 0) {
-      const latestMessage = wsMessages[wsMessages.length - 1];
+    const handleNewMessage = (event) => {
+      const message = event.detail;
 
-      // Add to current messages if it's for active conversation
-      if (latestMessage.conversation === activeConversation) {
-        // setCurrentMessages(prev => {
-        //   // Avoid duplicates
-        //   const exists = prev.find(m => m.id === latestMessage.id);
-        //   return exists ? prev : [...prev, latestMessage];
-        // });
-
+      if (message.conversation === activeConversation) {
         setCurrentMessages(prev => {
-          const tempIndex = prev.findIndex(
-            m =>
-              m.optimistic &&
-              m.content === latestMessage.content &&
-              m.sender.id === latestMessage.sender.id
-          );
-
-          if (tempIndex !== -1) {
-            const updated = [...prev];
-            updated[tempIndex] = latestMessage;
-            return updated;
-          }
-
-          const exists = prev.find(m => m.id === latestMessage.id);
-          return exists ? prev : [...prev, latestMessage];
+          const exists = prev.some(m => m.id === message.id);
+          return exists ? prev : [...prev, message];
         });
 
-
-        // Mark as read
-        if (latestMessage.sender.id !== getCurrentUserId()) {
-          wsMarkAsRead(latestMessage.id);
+        if (message.sender.id !== getCurrentUserId()) {
+          wsMarkAsRead(message.id, message.conversation);
         }
       }
 
-      // Update conversation list
-      updateConversationWithMessage(latestMessage);
-    }
-  }, [wsMessages, activeConversation]);
+      updateConversationWithMessage(message);
+    };
 
-  // Handle typing events
+    window.addEventListener('ws:new_message', handleNewMessage);
+    return () =>
+      window.removeEventListener('ws:new_message', handleNewMessage);
+  }, [activeConversation]);
+
+  // Typing indicator
   useEffect(() => {
     const handleTyping = (event) => {
       const { user_id, username, is_typing } = event.detail;
       setTypingUsers(prev => {
         const updated = new Map(prev);
-        if (is_typing) {
-          updated.set(user_id, username);
-        } else {
-          updated.delete(user_id);
-        }
+        if (is_typing) updated.set(user_id, username);
+        else updated.delete(user_id);
         return updated;
       });
     };
@@ -105,8 +83,6 @@ export const ChatProvider = ({ children }) => {
       setLoading(true);
       const data = await chatService.getConversations();
       setConversations(data);
-    } catch (error) {
-      console.error('Error loading conversations:', error);
     } finally {
       setLoading(false);
     }
@@ -116,18 +92,11 @@ export const ChatProvider = ({ children }) => {
     try {
       const conversation = await chatService.createOrGetConversation(participantId);
 
-      // Update conversations list
-      // setConversations(prev => {
-      //   const exists = prev.find(c => c.id === conversation.id);
-      //   return exists ? prev : [conversation, ...prev];
-      // });
-
       setConversations(prev => {
         if (!Array.isArray(prev)) return [conversation];
         const exists = prev.find(c => c.id === conversation.id);
         return exists ? prev : [conversation, ...prev];
       });
-
 
       return conversation;
     } catch (error) {
@@ -138,59 +107,42 @@ export const ChatProvider = ({ children }) => {
 
   const selectConversation = async (conversationId) => {
     try {
-      // Leave previous conversation
       if (activeConversation) {
         wsLeaveConversation(activeConversation);
       }
 
-      // Join new conversation
       wsJoinConversation(conversationId);
       setActiveConversation(conversationId);
 
-      // Load messages
+      localStorage.setItem('activeConversation', conversationId);
+
       setLoading(true);
       const data = await chatService.getMessages(conversationId);
-      setCurrentMessages(data.results || data.messages || []);
-      setWsMessages([]);
-
-      // Mark as read
-      await chatService.markConversationAsRead(conversationId);
-    } catch (error) {
-      console.error('Error selecting conversation:', error);
+      setCurrentMessages(data.results || []);
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  // const sendMessage = (content, replyTo = null) => {
-  //   if (activeConversation && content.trim()) {
-  //     wsSendMessage(activeConversation, content.trim(), replyTo);
-  //   }
-  // };
-
   const sendMessage = (content, replyTo = null) => {
     if (!activeConversation || !content.trim()) return;
 
-    const tempMessage = {
-      id: `temp-${Date.now()}`, // temporary id
-      content: content.trim(),
-      conversation: activeConversation,
-      sender: {
-        id: getCurrentUserId(),
-        username: 'You'
+    setCurrentMessages(prev => [
+      ...prev,
+      {
+        id: `temp-${Date.now()}`,
+        content,
+        conversation: activeConversation,
+        sender: { id: getCurrentUserId(), username: 'You' },
+        optimistic: true,
+        created_at: new Date().toISOString(),
       },
-      created_at: new Date().toISOString(),
-      optimistic: true
-    };
+    ]);
 
-    // 🔥 Update UI immediately
-    setCurrentMessages(prev => [...prev, tempMessage]);
-
-    // 🔥 Send to WebSocket
     wsSendMessage(activeConversation, content.trim(), replyTo);
   };
-
-
 
   const sendTypingIndicator = (isTyping) => {
     if (activeConversation) {
@@ -200,18 +152,19 @@ export const ChatProvider = ({ children }) => {
 
   const updateConversationWithMessage = (message) => {
     setConversations(prev => {
-      if (!Array.isArray(prev)) return prev;
-      return prev.map(conv => {
+      // ✅ Ensure prev is always an array
+      if (!Array.isArray(prev)) {
+        console.warn('Conversations is not an array, initializing as empty array');
+        return [];
+      }
 
-        if (conv.id === message.conversation) {
-          return {
-            ...conv,
-            last_message: message,
-            updated_at: message.created_at
-          };
-        }
-        return conv;
-      }).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      return prev
+        .map(c =>
+          c.id === message.conversation
+            ? { ...c, last_message: message, updated_at: message.created_at }
+            : c
+        )
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
     });
   };
 
@@ -220,25 +173,24 @@ export const ChatProvider = ({ children }) => {
     return user.id;
   };
 
-  const value = {
-    conversations,
-    activeConversation,
-    currentMessages,
-    loading,
-    isConnected,
-    typingUsers,
-    loadConversations,
-    createOrGetConversation,
-    selectConversation,
-    sendMessage,
-    sendTypingIndicator,
-    getCurrentUserId
-  };
-
   return (
-    <ChatContext.Provider value={value}>
+    <ChatContext.Provider
+      value={{
+        conversations,
+        activeConversation,
+        currentMessages,
+        loading,
+        isConnected,
+        typingUsers,
+        loadConversations,
+        createOrGetConversation,
+        selectConversation,
+        sendMessage,
+        sendTypingIndicator,
+        getCurrentUserId,
+      }}
+    >
       {children}
     </ChatContext.Provider>
   );
-
 };

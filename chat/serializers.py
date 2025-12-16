@@ -50,7 +50,17 @@ class MessageSerializer(serializers.ModelSerializer):
                 'message_type': obj.reply_to.message_type
             }
         return None
-    
+    def to_representation(self, instance):
+        """Convert UUIDs to strings for JSON serialization"""
+        data = super().to_representation(instance)
+        # Convert UUID fields to strings
+        data['id'] = str(instance.id)
+        data['conversation'] = str(instance.conversation.id)
+        data['sender']['id'] = str(instance.sender.id)
+        if instance.reply_to:
+            data['reply_to']['id'] = str(instance.reply_to.id)
+        return data
+            
     def get_is_read(self, obj):
         """Check if current user has read the message"""
         request = self.context.get('request')

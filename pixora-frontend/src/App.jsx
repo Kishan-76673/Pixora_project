@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore } from './store/themeStore';
 
@@ -27,7 +27,6 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
       <Routes>
 
         <Route path="/login" element={<Login />} />
@@ -43,7 +42,6 @@ function App() {
           <Route path="/messages" element={<Messages />} />
         </Route>
       </Routes>
-    </BrowserRouter>
   );
 }
 

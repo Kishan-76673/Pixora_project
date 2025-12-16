@@ -27,7 +27,7 @@ SECRET_KEY = "django-insecure-eh8trmi156j6cck_9q47tul+9=ko2q887+-e-%#js*s(!a*bd6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
 
 
 # Application definition
@@ -40,21 +40,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'channels',   
-
-    # Your apps
     'accounts',
     'posts',
     'social',
     'notifications',
     'analytics',
     'chat',
-    # for OTP
     'django_otp',
     'django_otp.plugins.otp_totp',
 ]
@@ -83,7 +78,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False # change to false for security
 
 ROOT_URLCONF = "pixora_backend.urls"
 
@@ -199,6 +194,17 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True 
+CORS_ORIGIN_ALLOW_ALL = True 
+
+# Remove or comment out any CSRF settings that might block WebSocket
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# ✅ ADD THIS - Disable CSRF for WebSocket
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
 
 # Media Files Configuration (Local Storage for now)
 MEDIA_URL = '/media/'

@@ -17,9 +17,11 @@ const ChatWindow = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [replyTo, setReplyTo] = useState(null);
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+
 
   const currentConversation = conversations.find(c => c.id === activeConversation);
   const otherUser = currentConversation?.other_user;
@@ -27,7 +29,7 @@ const ChatWindow = () => {
 
   // Scroll to bottom on new messages
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [currentMessages]);
 
   const scrollToBottom = () => {
@@ -36,7 +38,11 @@ const ChatWindow = () => {
 
   const handleSend = (e) => {
     e.preventDefault();
+    
+    if (!inputMessage.trim()) return;
+
     if (inputMessage.trim()) {
+      // sendMessage(activeConversation, inputMessage, replyTo?.id);
       sendMessage(inputMessage, replyTo?.id);
       setInputMessage('');
       setReplyTo(null);
@@ -60,7 +66,7 @@ const ChatWindow = () => {
       // Stop typing after 3 seconds of no input
       typingTimeoutRef.current = setTimeout(() => {
         sendTypingIndicator(false);
-      }, 3000);
+      }, 2000);
     } else {
       sendTypingIndicator(false);
     }
@@ -149,7 +155,7 @@ const ChatWindow = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </button>
-            
+
             {showEmojiPicker && (
               <div className="absolute bottom-12 left-0 z-10">
                 <EmojiPicker onEmojiClick={handleEmojiClick} />

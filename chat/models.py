@@ -65,7 +65,8 @@ class Message(models.Model):
         default='text'
     )
     file = models.FileField(
-        upload_to='chat_files/%Y/%m/',
+        # upload_to='chat_files/%Y/%m/',
+        upload_to='chat_files/',
         blank=True,
         null=True
     )
@@ -115,3 +116,29 @@ class MessageRead(models.Model):
     
     def __str__(self):
         return f"{self.user.username} read message at {self.read_at}"
+
+class MessageReaction(models.Model):
+    """Model for message reactions (emojis)"""
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    message = models.ForeignKey(
+        Message,
+        on_delete=models.CASCADE,
+        related_name='reactions'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    emoji = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'chat_message_reactions'
+        unique_together = ['message', 'user', 'emoji']
+        indexes = [
+            models.Index(fields=['message', 'emoji']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} reacted {self.emoji} to message"
