@@ -1,31 +1,41 @@
 import api from './api';
 
 export const followService = {
-  // Follow a user - FIXED URL
+  // Follow a user
   followUser: async (username) => {
     const response = await api.post(`/users/${username}/follow/`);
-    return response.data;
+    const data = response.data;
+
+    // Handle both response formats (old: 'following', new: 'is_following')
+    if (data.following !== undefined && data.is_following === undefined) {
+      data.is_following = data.following;
+    }
+    return data;
   },
 
-  // Unfollow a user - FIXED URL
+  // Unfollow a user
   unfollowUser: async (username) => {
     const response = await api.delete(`/users/${username}/follow/`);
-    return response.data;
+    const data = response.data;
+
+    // Handle both response formats
+    if (data.following !== undefined && data.is_following === undefined) {
+      data.is_following = data.following;
+    }
+    return data;
   },
 
-  // Check follow status - FIXED URL
+  // Check follow status
   checkFollowStatus: async (username) => {
     const response = await api.get(`/users/${username}/follow/status/`);
     return response.data;
   },
 
-  // Get followers
   getFollowers: async (username) => {
     const response = await api.get(`/users/${username}/followers/`);
-    return response.data;
+    return response.data; 
   },
 
-  // Get following
   getFollowing: async (username) => {
     const response = await api.get(`/users/${username}/following/`);
     return response.data;

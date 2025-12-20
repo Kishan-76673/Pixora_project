@@ -6,7 +6,7 @@ from .models import EmailOTP
 from social.models import Follow
 from django.contrib.auth.password_validation import validate_password
 import re
-User = get_user_model()
+User = get_user_model() 
 
 class SendOTPSerializer(serializers.Serializer):
     """Serializer for sending OTP"""
@@ -54,9 +54,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     avatar_url = serializers.SerializerMethodField()
     post_count = serializers.SerializerMethodField()
-    follower_count = serializers.IntegerField(default=0, read_only=True)
-    following_count = serializers.IntegerField(default=0, read_only=True)
-    
+    follower_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = [
@@ -78,6 +78,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def get_post_count(self, obj):
         """Get user's post count"""
         return obj.posts.count()
+
+    def get_follower_count(self, obj):
+        from social.models import Follow
+        count = Follow.objects.filter(following=obj).count()
+        print(f"🔍 Getting follower_count for {obj.username}: {count}")
+        return count
+
+    def get_following_count(self, obj):
+        from social.models import Follow
+        count = Follow.objects.filter(follower=obj).count()
+        print(f"🔍 Getting following_count for {obj.username}: {count}")
+        return count
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     """Serializer for updating user profile"""
@@ -155,8 +167,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-
-
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()

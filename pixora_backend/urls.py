@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/', include('posts.urls')),
     path('api/', include('social.urls')),
     path('api/', include('chat.urls')), 
+    path('api/', include('social.urls')),
 ]
 
 if settings.DEBUG:

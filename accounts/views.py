@@ -17,8 +17,10 @@ from django.conf import settings
 import threading
 from datetime import datetime, timedelta
 from django.utils import timezone
-
-
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth import authenticate
+from django.db import transaction
 from .models import EmailOTP
 from .serializers import (
     RegisterSerializer, 
@@ -497,3 +499,85 @@ class UpdateProfileView(generics.UpdateAPIView):
             'message': 'Profile updated successfully',
             'user': profile_serializer.data
         }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    DELETE /api/auth/delete-account/
+    Permanently delete user account with all associated data
+    """
+    user = request.user
+    username = request.data.get('username')
+    password = request.data.get('password')
+    confirmation = request.data.get('confirmation')
+    
+    # Validation 1: Check confirmation format
+    expected_confirmation = f"{user.username}/DeleteAccount"
+    if confirmation != expected_confirmation:
+        return Response({
+            'error': f'Please type "{expected_confirmation}" to confirm'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Validation 2: Verify password
+    if not authenticate(username=user.email, password=password):
+        return Response({
+            'error': 'Invalid password'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Validation 3: Double check username matches
+    if username != user.username:
+        return Response({
+            'error': 'Username does not match'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        with transaction.atomic():
+            # 1. Delete all user's posts (cascade will delete comments, likes on those posts)
+            from posts.models import Post, Story
+            Post.objects.filter(user=user).delete()
+            Story.objects.filter(user=user).delete()
+            
+            # 2. Delete all comments made by user on other posts
+            from posts.models import Comment
+            Comment.objects.filter(user=user).delete()
+            
+            # 3. Delete all likes made by user
+            from posts.models import Like
+            Like.objects.filter(user=user).delete()
+            
+            # 4. Delete user's avatar/profile picture
+            if user.avatar:
+                user.avatar.delete(save=False)
+            
+            # 5. Delete chat messages sent by user
+            from chat.models import Message, Conversation
+            Message.objects.filter(sender=user).delete()
+            
+            # Remove user from conversations but keep conversation for other participants
+            for conversation in Conversation.objects.filter(participants=user):
+                conversation.participants.remove(user)
+                if conversation.participants.count() == 0:
+                    conversation.delete()
+            
+            # 6. Soft delete user - Mark as deleted but keep username/email/follows
+            user.is_active = False
+            user.full_name = "[Deleted User]"
+            user.bio = ""
+            user.avatar = None
+            user.email = f"deleted_{user.id}@pixora.deleted"  # Anonymize email
+            user.save()
+            
+            # Keep username, following, followers in database (as per requirement)
+            # These remain intact in social.models.Follow
+            
+            return Response({
+                'message': 'Account deleted successfully',
+                'deleted': True
+            }, status=status.HTTP_200_OK)
+            
+    except Exception as e:
+        return Response({
+            'error': f'Failed to delete account: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

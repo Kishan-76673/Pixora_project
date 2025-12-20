@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
+from .views import delete_account
 
 app_name = 'accounts'
 
@@ -20,4 +21,5 @@ urlpatterns = [
     # Profile
     path('users/<str:username>/', views.UserProfileView.as_view(), name='user_profile'),
     path('profile/update/', views.UpdateProfileView.as_view(), name='update_profile'),
+    path('auth/delete-account/', delete_account, name='delete-account'),
 ]

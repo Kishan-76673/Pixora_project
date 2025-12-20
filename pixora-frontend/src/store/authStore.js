@@ -16,9 +16,9 @@ export const useAuthStore = create((set) => ({
       set({ success: 'OTP sent to your email!' });
       return response;
     } catch (error) {
-      const errorMsg = error.response?.data?.error || 
-                       error.response?.data?.email?.[0] || 
-                       'Failed to send OTP';
+      const errorMsg = error.response?.data?.error ||
+        error.response?.data?.email?.[0] ||
+        'Failed to send OTP';
       set({ error: errorMsg });
       throw error;
     } finally {
@@ -29,15 +29,15 @@ export const useAuthStore = create((set) => ({
 
   // Verify OTP
   verifyOTP: async (email, otp) => {
-    set({ loading: true, error: null,success: null });
+    set({ loading: true, error: null, success: null });
     try {
       const response = await authService.verifyOTP(email, otp);
       set({ success: 'Email verified successfully!' });
       return response;
     } catch (error) {
-      const errorMsg = error.response?.data?.error || 
-                       error.response?.data?.detail || 
-                       'Invalid OTP';
+      const errorMsg = error.response?.data?.error ||
+        error.response?.data?.detail ||
+        'Invalid OTP';
       set({ error: errorMsg });
       throw error;
     } finally {
@@ -54,9 +54,9 @@ export const useAuthStore = create((set) => ({
       return data;
     } catch (error) {
       const errorMsg = error.response?.data?.message ||
-  error.response?.data?.detail ||
-  error.response?.data?.error ||
-  'Login failed';
+        error.response?.data?.detail ||
+        error.response?.data?.error ||
+        'Login failed';
 
       set({ error: errorMsg, loading: false });
       throw error;
@@ -89,4 +89,23 @@ export const useAuthStore = create((set) => ({
   },
 
   clearError: () => set({ error: null }),
+
+
+  updateFollowCounts: (delta) => {
+    set((state) => {
+      if (!state.user) return state;
+
+      const updatedUser = {
+        ...state.user,
+        following_count: state.user.following_count + delta,
+      };
+
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      return { user: updatedUser };
+    });
+  },
+
 }));
+
+

@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-
+from .views import FollowersListView, FollowingListView
 app_name = 'social'
 
 urlpatterns = [
@@ -11,4 +11,7 @@ urlpatterns = [
     # Followers/Following lists
     path('users/<str:username>/followers/', views.FollowerListView.as_view(), name='followers'),
     path('users/<str:username>/following/', views.FollowingListView.as_view(), name='following'),
+
+    path('users/<str:username>/followers/', FollowersListView.as_view()),
+    path('users/<str:username>/following/', FollowingListView.as_view()),
 ]

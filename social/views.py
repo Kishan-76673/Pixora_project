@@ -3,11 +3,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-
+from django.db import transaction
 from .models import Follow
 from .serializers import FollowSerializer
 from accounts.serializers import UserSerializer, UserProfileSerializer
-
+  
 User = get_user_model()
 
 class FollowUserView(APIView):
@@ -17,6 +17,7 @@ class FollowUserView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     
+    @transaction.atomic
     def post(self, request, username):
         user_to_follow = get_object_or_404(User, username=username)
         
@@ -33,25 +34,17 @@ class FollowUserView(APIView):
             following=user_to_follow
         )
 
-        # Get updated counts
         follower_count = Follow.objects.filter(following=user_to_follow).count()
         following_count = Follow.objects.filter(follower=request.user).count()
 
-        if created:
-            return Response({
-                'message': f'You are now following {username}',
-                'following': True,
-                'follower_count': follower_count,
-                'following_count': following_count
-            }, status=status.HTTP_201_CREATED)
-        else:
-            return Response({
-                'message': f'You are already following {username}',
-                'following': True,
-                'follower_count': follower_count,
-                'following_count': following_count
-            }, status=status.HTTP_200_OK)
+        return Response({
+            'message': f'You are now following {username}' if created else f'You are already following {username}',
+            'is_following': True,
+            'follower_count': follower_count,      # Viewed user's followers
+            'following_count': following_count,     # YOUR following count
+        }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
     
+    @transaction.atomic
     def delete(self, request, username):
         user_to_unfollow = get_object_or_404(User, username=username)
         
@@ -62,21 +55,19 @@ class FollowUserView(APIView):
             )
             follow.delete()
             
-            # Get updated counts
             follower_count = Follow.objects.filter(following=user_to_unfollow).count()
             following_count = Follow.objects.filter(follower=request.user).count()
             
             return Response({
                 'message': f'You unfollowed {username}',
-                'following': False,
-                'follower_count': follower_count,
-                'following_count': following_count
+                'is_following': False,
+                'follower_count': follower_count,    
+                'following_count': following_count,   
             }, status=status.HTTP_200_OK)
         except Follow.DoesNotExist:
             return Response({
                 'error': 'You are not following this user'
             }, status=status.HTTP_404_NOT_FOUND)
-
 
 class CheckFollowStatusView(APIView):
     """GET /api/users/:username/follow/status/ - Check if following"""
@@ -99,13 +90,12 @@ class FollowerListView(generics.ListAPIView):
     """GET /api/users/:username/followers/ - Get user's followers"""
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    
+    pagination_class = None
     def get_queryset(self):
         username = self.kwargs['username']
         user = get_object_or_404(User, username=username)
         
-        # Get all users who follow this user
-        follower_ids = Follow.objects.filter(following=user).values_list('follower', flat=True)
+        follower_ids = Follow.objects.filter(following=user).values_list('follower', flat=True) 
         return User.objects.filter(id__in=follower_ids)
 
 
@@ -113,12 +103,11 @@ class FollowingListView(generics.ListAPIView):
     """GET /api/users/:username/following/ - Get users this user follows"""
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    
+    pagination_class = None
     def get_queryset(self):
         username = self.kwargs['username']
         user = get_object_or_404(User, username=username)
         
-        # Get all users this user follows
         following_ids = Follow.objects.filter(follower=user).values_list('following', flat=True)
         return User.objects.filter(id__in=following_ids)
         

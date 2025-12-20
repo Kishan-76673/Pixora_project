@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userService } from '../services/UserService';
 import { useAuthStore } from '../store/authStore';
-
+import DeleteAccountModal from '../components/settings/DeleteAccountModal';
 const EditProfile = () => {
   const navigate = useNavigate();
   const { user: currentUser, login } = useAuthStore();
@@ -15,6 +15,7 @@ const EditProfile = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -86,8 +87,6 @@ const EditProfile = () => {
         ...response.user
       };
       localStorage.setItem('user', JSON.stringify(updatedUser));
-
-      alert('Profile updated successfully!');
       navigate(`/profile/${currentUser.username}`);
     } catch (error) {
       console.error('Update profile error:', error);
@@ -101,8 +100,15 @@ const EditProfile = () => {
     <div className="row justify-content-center">
       <div className="col-lg-6">
         <div className="card shadow-sm">
-          <div className="card-header bg-white">
+           <div className="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 className="mb-0">Edit Profile</h5>
+            <button 
+              className="btn btn-outline-danger btn-sm"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <i className="bi bi-gear me-1"></i>
+              Account Settings
+            </button>
           </div>
           <div className="card-body">
             {error && (
@@ -218,7 +224,36 @@ const EditProfile = () => {
             </form>
           </div>
         </div>
+
+        {/* Danger Zone */}
+        <div className="card shadow-sm mt-3 border-danger">
+          <div className="card-header bg-danger text-white">
+            <h6 className="mb-0">
+              <i className="bi bi-exclamation-triangle me-2"></i>
+              Danger Zone
+            </h6>
+          </div>
+          <div className="card-body">
+            <p className="text-muted mb-3">
+              Once you delete your account, there is no going back. Please be certain.
+            </p>
+            <button 
+              className="btn btn-danger"
+              onClick={() => setShowDeleteModal(true)}
+            >
+              <i className="bi bi-trash me-2"></i>
+              Delete Account
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Delete Account Modal */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        username={currentUser?.username}
+      />
     </div>
   ); 
 };

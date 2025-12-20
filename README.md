@@ -11,7 +11,7 @@
    - Backend: `python manage.py runserver`
    - Frontend: `npm run dev`
     daphne -b 0.0.0.0 -p 8000 pixora_backend.asgi:application
-
+    daphne -b 0.0.0.0 -p 8000 pixora_backend.asgi:application
 
 
 # pixora

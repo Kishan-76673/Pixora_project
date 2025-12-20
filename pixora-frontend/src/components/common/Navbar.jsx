@@ -17,9 +17,18 @@ const Navbar = () => {
     <nav
       className="navbar navbar-expand-lg shadow-sm sticky-top pixora-navbar"
     >
-      <div className="container">
-        <Link to="/" className="navbar-brand pixora-logo fw-bold fs-3">
-          Pixora
+      <div className="container-fluid">
+        <Link to="/" className="navbar-brand d-flex align-items-center me-auto">
+          <img
+            src="/logo_transparent_text.png"
+            alt="Pixora Logo"
+            style={{
+              // align: screenLeft,
+              height: "40px",
+              width: "auto",
+              maxWidth: "150px"
+            }}
+          />
         </Link>
 
         <button
@@ -27,12 +36,15 @@ const Navbar = () => {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
           <i className="bi bi-list"></i>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center gap-3">
+        <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <ul className="navbar-nav align-items-center gap-3">
 
             {isAuthenticated ? (
               <>
@@ -52,7 +64,7 @@ const Navbar = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <Link
                     to="/create"
                     className={`navbar-icon-btn ${location.pathname === "/create" ? "active-nav" : ""}`}
@@ -62,7 +74,7 @@ const Navbar = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <Link
                     to={`/profile/${user?.username}`}
                     className="navbar-icon-btn"
@@ -85,7 +97,7 @@ const Navbar = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <button
                     onClick={toggleTheme}
                     className="navbar-icon-btn"
@@ -95,7 +107,7 @@ const Navbar = () => {
                   </button>
                 </li>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <button
                     className="navbar-icon-btn"
                     onClick={handleLogout}
@@ -108,7 +120,7 @@ const Navbar = () => {
             ) : (
               <>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <button
                     onClick={toggleTheme}
                     className="btn btn-link nav-link p-0"
@@ -118,15 +130,14 @@ const Navbar = () => {
                   </button>
                 </li>
 
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <Link to="/login" className="btn btn-light px-4">Login</Link>
                 </li>
-                <li className="nav-item mx-2">
+                <li className="nav-item">
                   <Link to="/register" className="btn btn-outline-light px-4">Sign Up</Link>
                 </li>
               </>
             )}
-
           </ul>
         </div>
       </div>

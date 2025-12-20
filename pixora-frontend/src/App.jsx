@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { useThemeStore } from './store/themeStore';
-
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,6 +12,8 @@ import EditProfile from './pages/EditProfile';
 import CreateStory from './pages/CreateStory';
 import PostDetail from './pages/PostDetail';
 import Messages from './pages/Messages';
+import Followers from './pages/Followers';
+import Following from './pages/Following';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
@@ -27,21 +28,25 @@ function App() {
   }, []);
 
   return (
-      <Routes>
+    <Routes>
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
-        <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-          <Route index element={<Home />} />
-          <Route path="create" element={<CreatePost />} />
-          <Route path="profile/:username" element={<Profile />} />
-          <Route path="profile/edit" element={<EditProfile />} />
-          <Route path="stories/create" element={<CreateStory />} />
-          <Route path="posts/:postId" element={<PostDetail />} />
-          <Route path="/messages" element={<Messages />} />
-        </Route>
-      </Routes>
+      <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+        <Route index element={<Home />} />
+        <Route path="create" element={<CreatePost />} />
+        <Route path="profile/:username" element={<Profile />} />
+        <Route path="profile/edit" element={<EditProfile />} />
+        <Route path="stories/create" element={<CreateStory />} />
+        <Route path="posts/:postId" element={<PostDetail />} />
+        <Route path="/messages" element={<Messages />} />
+
+        <Route path="profile/:username/followers" element={<Followers />} />
+        <Route path="profile/:username/following" element={<Following />} />
+
+      </Route>
+    </Routes>
   );
 }
 
