@@ -1,9 +1,11 @@
+from urllib.parse import parse_qs
 from channels.db import database_sync_to_async
+from django.contrib.auth.models import AnonymousUser
 from channels.middleware import BaseMiddleware
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken
-from urllib.parse import parse_qs
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 User = get_user_model()
 
@@ -12,13 +14,19 @@ def get_user_from_token(token):
     """Get user from JWT token"""
     try:
         # Decode the token
-        access_token = AccessToken(token)
-        user_id = access_token['user_id']
-        
-        # Get user from database
-        user = User.objects.get(id=user_id)
+        jwt_auth = JWTAuthentication()
+        validated_token = jwt_auth.get_validated_token(token)
+        user = jwt_auth.get_user(validated_token)
         return user
-    except Exception as e:
+
+
+        # access_token = AccessToken(token)
+        # user_id = access_token['user_id']
+        
+        # # Get user from database
+        # user = User.objects.get(id=user_id)
+        # return user
+    except (InvalidToken, TokenError) as e:
         print(f"❌ Token validation failed: {str(e)}")
         return AnonymousUser()
 
@@ -32,13 +40,30 @@ class JWTAuthMiddleware(BaseMiddleware):
         query_string = scope.get('query_string', b'').decode()
         query_params = parse_qs(query_string)
         token = query_params.get('token', [None])[0]
-        
-        if token:
-            print(f"🔑 Authenticating with token: {token[:20]}...")
-            scope['user'] = await get_user_from_token(token)
-            print(f"✅ Authenticated user: {scope['user']}")
-        else:
+
+        if not token:
             print("❌ No token provided")
-            scope['user'] = AnonymousUser()
-        
+            await send({
+                "type": "websocket.close",
+                "code": 4401,  # Unauthorized
+            })
+            return
+
+        print(f"🔑 Authenticating with token: {token[:20]}...")
+        user = await get_user_from_token(token)
+
+        if isinstance(user, AnonymousUser):
+            await send({
+                "type": "websocket.close",
+                "code": 4401,
+            })
+            return
+
+        scope["user"] = user
+        print(f"✅ Authenticated user: {user}")
+
         return await super().__call__(scope, receive, send)
+
+
+
+

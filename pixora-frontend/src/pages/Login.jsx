@@ -1,19 +1,23 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { authService } from '../services/authService';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { login, loading, error } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  // ✅ Get session expired message if any
+  const sessionMessage = location.state?.message;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const payload = {
-    email: formData.email,   
-    password: formData.password,
-  };
+      email: formData.email,
+      password: formData.password,
+    };
     try {
       await login(payload);
       navigate('/');
@@ -35,6 +39,19 @@ const Login = () => {
                     Sign in to see photos and videos from your friends.
                   </p>
                 </div>
+
+                {/* ✅ Session Expired Alert */}
+                {sessionMessage && (
+                  <div className="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i className="bi bi-clock-history me-2"></i>
+                    {sessionMessage}
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={() => navigate(location.pathname, { replace: true, state: {} })}
+                    ></button>
+                  </div>
+                )}
 
                 {error && (
                   <div className="alert alert-danger" role="alert">

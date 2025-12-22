@@ -43,7 +43,7 @@ class FollowUserView(APIView):
             'follower_count': follower_count,      # Viewed user's followers
             'following_count': following_count,     # YOUR following count
         }, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
-    
+
     @transaction.atomic
     def delete(self, request, username):
         user_to_unfollow = get_object_or_404(User, username=username)

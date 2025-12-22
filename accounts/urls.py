@@ -11,7 +11,7 @@ urlpatterns = [
     path('auth/login/', views.LoginView.as_view(), name='login'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     
-    # OTP - ADD THESE
+    # For OTP
     path('auth/send-otp/', views.SendOTPView.as_view(), name='send_otp'),
     path('auth/verify-otp/', views.VerifyOTPView.as_view(), name='verify_otp'),
     
@@ -22,4 +22,7 @@ urlpatterns = [
     path('users/<str:username>/', views.UserProfileView.as_view(), name='user_profile'),
     path('profile/update/', views.UpdateProfileView.as_view(), name='update_profile'),
     path('auth/delete-account/', delete_account, name='delete-account'),
+
+    # for token refresh
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 ]

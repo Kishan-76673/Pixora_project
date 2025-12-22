@@ -1,12 +1,11 @@
 import { create } from 'zustand';
 import { authService } from '../services/authService';
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: authService.getCurrentUser(),
   isAuthenticated: authService.isAuthenticated(),
   loading: false,
   error: null,
-
 
   // Send OTP
   sendOTP: async (email) => {
@@ -26,7 +25,6 @@ export const useAuthStore = create((set) => ({
     }
   },
 
-
   // Verify OTP
   verifyOTP: async (email, otp) => {
     set({ loading: true, error: null, success: null });
@@ -44,7 +42,6 @@ export const useAuthStore = create((set) => ({
       set({ loading: false });
     }
   },
-
 
   login: async (credentials) => {
     set({ loading: true, error: null });
@@ -67,7 +64,7 @@ export const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const data = await authService.register(userData);
-      const { access, refresh, user } = response;
+      // const { access, refresh, user } = response;
       set({ loading: false });
       return data;
     } catch (error) {
@@ -80,6 +77,7 @@ export const useAuthStore = create((set) => ({
   logout: () => {
     authService.logout();
     set({ user: null, isAuthenticated: false });
+    window.location.href = '/login';
   },
 
   updateUser: (userData) => {
@@ -106,6 +104,40 @@ export const useAuthStore = create((set) => ({
     });
   },
 
+  refreshAccessToken: async () => {
+    try {
+      const newAccessToken = await authService.refreshToken();
+      return newAccessToken;
+    } catch (error) {
+      get().logout();
+      throw error;
+    }
+  },
+
+  // Initialize auth from localStorage
+  initializeAuth: () => {
+    const token = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const userStr = localStorage.getItem('user');
+
+    if (token && refreshToken && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        set({
+          user,
+          isAuthenticated: true,
+        });
+      } catch {
+        get().logout();
+      }
+    }
+  },
 }));
 
+// Listen for logout event from api.js
+if (typeof window !== 'undefined') {
+  window.addEventListener('logout', () => {
+    useAuthStore.getState().logout();
+  });
+}
 

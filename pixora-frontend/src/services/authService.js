@@ -1,5 +1,5 @@
 import api from './api';
-
+import { useAuthStore } from '../store/authStore';
 export const authService = {
 
   // authService.js - Add this function
